@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plush Stock Photos</title>
+    
+    <!-- Correct FontAwesome Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/css/splide.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Top Sale Banner -->
+    <div class="top-banner">
+        SUPER SALE UP TO 40% OFF
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <!-- Left: SHOP & COMMUNITY Tags -->
+        <div class="nav-tags">
+            <span class="tag red">SHOP</span>
+            <span class="tag purple">COMMUNITY</span>
+        </div>
+
+        <!-- Center: Logo -->
+        <div class="logo">
+            <img src="images/plushlogo.png" alt="PLUSH Logo" class="logo-img">
+        </div>
+
+        <!-- Right: Icons -->
+        <div class="nav-icons">
+            <img src="images/Frame (1).png" alt="User" class="nav-icon">
+            <img src="images/Frame.png" alt="Search" class="nav-icon">
+            <img src="images/Vector (13).png" alt="Cart" class="nav-icon">
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="content">
+            <h1>Stock photos</h1>
+            <p>
+                John Wick is on the run after killing a member of the international assassins’ guild, and with 
+                a $14 million price tag on his head, he is the target of hit men and women everywhere.
+            </p>
+            <button class="explore-btn">
+                <img src="images/Icon.png" alt="Play Icon" class="btn-icon"> EXPLORE
+            </button>
+        </div>
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" placeholder="Search images...">
+        <button class="search-btn" onclick="searchImages()">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    <section class="splide" id="imageSlider">
+        <div class="splide__track">
+            <ul class="splide__list" id="imageSliderList">
+            </ul>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
