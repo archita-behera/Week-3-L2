@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-    fetchImages("nature");
+    fetchImages("laptop"); // Default search term
 });
+
+let favoriteImages = [];
 
 function fetchImages(query) {
     const API_KEY = "eGwF4GuYV8htzT8C7RzEMOqj8011EjwAVDYeN6dzIi4njP3RuIpIJwJa";
@@ -8,46 +10,130 @@ function fetchImages(query) {
 
     fetch(API_URL, {
         method: "GET",
-        headers: {
-            "Authorization": API_KEY
-        }
+        headers: { "Authorization": API_KEY }
     })
     .then(response => response.json())
     .then(data => {
-        const imageSliderList = document.getElementById("imageSliderList");
-        imageSliderList.innerHTML = ""; 
-
         if (data.photos && data.photos.length > 0) {
-            data.photos.forEach(photo => {
-                const li = document.createElement("li");
-                li.classList.add("splide__slide");
-                li.innerHTML = `
-                    <img src="${photo.src.medium}" alt="Stock Image">
-                    <div class="image-details">
-                        <p>Photographer: ${photo.photographer}</p>
-                    </div>
-                `;
-                imageSliderList.appendChild(li);
-            });
-
-            // Initialize Splide after images are loaded
-            new Splide("#imageSlider", {
-                type: "loop",
-                perPage: 3,
-                perMove: 1,
-                gap: "1rem",
-                autoplay: true,
-                interval: 3000,
-                breakpoints: {
-                    768: { perPage: 2 },
-                    480: { perPage: 1 }
-                }
-            }).mount();
-        } else {
-            imageSliderList.innerHTML = "<p>No images found.</p>";
+            displaySelectedImage(data.photos[0]);
+            displaySimilarResults(data.photos.slice(1));
         }
     })
     .catch(error => console.error("Error fetching data:", error));
+}
+
+function displaySelectedImage(image) {
+    document.getElementById("selectedImage").src = image.src.medium;
+    document.getElementById("imageTitle").textContent = image.alt;
+    document.getElementById("photographerName").textContent = `Photographer: ${image.photographer}`;
+}
+
+function exploreMore() {
+    const imageTitle = document.getElementById("imageTitle").textContent;
+    const searchQuery = encodeURIComponent(imageTitle); 
+    window.location.href = `https://www.pexels.com/search/${searchQuery}/`;
+}
+
+
+function displaySimilarResults(images) {
+    const imageSliderList = document.getElementById("imageSliderList");
+    imageSliderList.innerHTML = "";
+
+    images.forEach(photo => {
+        const li = document.createElement("li");
+        li.classList.add("splide__slide");
+
+        li.innerHTML = `
+            <div class="image-card">
+                <img src="${photo.src.medium}" alt="${photo.alt}">
+                <button class="heart-btn" onclick='toggleFavorite(this, ${JSON.stringify(photo)})'>
+                    <i class="fas fa-heart"></i>
+                </button>
+            </div>
+        `;
+        imageSliderList.appendChild(li);
+    });
+
+    new Splide("#imageSlider", {
+        type: "loop",
+        perPage: 3,
+        perMove: 1,
+        gap: "1rem",
+        autoplay: true,
+        interval: 3000,
+        breakpoints: { 768: { perPage: 2 }, 480: { perPage: 1 } }
+    }).mount();
+}
+
+function toggleFavorite(button, imageData) {
+    const icon = button.querySelector("i");
+
+    const imageIndex = favoriteImages.findIndex(fav => fav.src.medium === imageData.src.medium);
+
+    if (imageIndex !== -1) {
+        // Remove from favorites
+        favoriteImages.splice(imageIndex, 1);
+        icon.classList.remove("favorited");
+        icon.style.color = "black"; // Change back to black
+    } else {
+        // Add to favorites
+        favoriteImages.push(imageData);
+        icon.classList.add("favorited");
+        icon.style.color = "red"; // Make it red
+    }
+
+    updateFavoriteSlider();
+}
+
+let favoriteSliderInstance = null; // Store Splide instance globally
+
+function updateFavoriteSlider() {
+    const favoriteSliderList = document.getElementById("favoriteSliderList");
+    favoriteSliderList.innerHTML = "";
+
+    if (favoriteImages.length === 0) {
+        favoriteSliderList.innerHTML = "<p>No favorites added yet.</p>";
+        return;
+    }
+
+    favoriteImages.forEach(photo => {
+        const li = document.createElement("li");
+        li.classList.add("splide__slide");
+
+        li.innerHTML = `
+            <div class="image-card">
+                <img src="${photo.src.medium}" alt="${photo.alt}">
+                <button class="remove-btn" onclick='removeFavorite("${photo.src.medium}")'>
+                     <i class="fas fa-heart"></i>
+                </button>
+            </div>
+        `;
+        favoriteSliderList.appendChild(li);
+    });
+
+    // Destroy previous Splide instance to avoid duplicates
+    if (favoriteSliderInstance) {
+        favoriteSliderInstance.destroy();
+    }
+
+    // Re-initialize Splide only once
+    favoriteSliderInstance = new Splide("#favoriteSlider", {
+        type: "loop",
+        perPage: 3,
+        perMove: 1,
+        gap: "1rem",
+        autoplay: true,
+        interval: 3000,
+        breakpoints: { 768: { perPage: 2 }, 480: { perPage: 1 } }
+    });
+
+    favoriteSliderInstance.mount();
+}
+
+
+function removeFavorite(imageSrc) {
+    favoriteImages = favoriteImages.filter(img => img.src.medium !== imageSrc);
+    updateFavoriteSlider();
 }
 
 function searchImages() {
